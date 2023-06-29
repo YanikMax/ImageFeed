@@ -1,88 +1,89 @@
-import Foundation
 import UIKit
 
 final class ProfileViewController: UIViewController {
-    private var avatarImageView: UIImageView?
-    private var nameLabel: UILabel?
-    private var loginNameLabel: UILabel?
-    private var descriptionLabel: UILabel?
+    private let avatarImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "avatar")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    private var nameLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Екатерина Новикова"
+        label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let logoutButton: UIButton = {
+        let button = UIButton.systemButton(
+            with: UIImage(systemName: "ipad.and.arrow.forward")!,
+            target: ProfileViewController.self,
+            action: #selector(didTapButton)
+        )
+        button.tintColor = .red
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let loginNameLabel: UILabel = {
+        let label = UILabel()
+        label.text = "@ekaterina_nov"
+        label.textColor = .gray
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Hello, world!"
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupAvatarImageView()
-        setupNameLabel()
-        setupLogoutButton()
-        setupLoginNameLabel()
-        setupDescriptionLabel()
+        addSubViews()
+        applyConstraints()
     }
     
-    private func setupAvatarImageView() {
-        avatarImageView = UIImageView()
-        avatarImageView?.image = UIImage(named: "avatar")
-        avatarImageView?.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(avatarImageView!)
-        
+    private func addSubViews() {
+        view.addSubview(avatarImageView)
+        view.addSubview(nameLabel)
+        view.addSubview(logoutButton)
+        view.addSubview(loginNameLabel)
+        view.addSubview(descriptionLabel)
+    }
+    
+    private func applyConstraints() {
         NSLayoutConstraint.activate([
-            avatarImageView!.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            avatarImageView!.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            avatarImageView!.widthAnchor.constraint(equalToConstant: 70),
-            avatarImageView!.heightAnchor.constraint(equalToConstant: 70)
+            avatarImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            avatarImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
+            avatarImageView.widthAnchor.constraint(equalToConstant: 70),
+            avatarImageView.heightAnchor.constraint(equalToConstant: 70),
+            
+            nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.leadingAnchor),
+            nameLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 8),
+            
+            logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
+            logoutButton.centerYAnchor.constraint(equalTo: avatarImageView.centerYAnchor),
+            
+            loginNameLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            
+            descriptionLabel.leadingAnchor.constraint(equalTo: loginNameLabel.leadingAnchor),
+            descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8)
         ])
     }
     
-    private func setupNameLabel() {
-        let nameLabel = UILabel()
-        nameLabel.text = "Екатерина Новикова"
-        nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(nameLabel)
-        nameLabel.leadingAnchor.constraint(equalTo: avatarImageView!.leadingAnchor).isActive = true
-        nameLabel.topAnchor.constraint(equalTo: avatarImageView!.bottomAnchor, constant: 8).isActive = true
-        nameLabel.textColor = .white
-        self.nameLabel = nameLabel
-    }
-    
-    private func setupLogoutButton() {
-        let logoutButton = UIButton.systemButton(
-            with: UIImage(systemName: "ipad.and.arrow.forward")!,
-            target: self,
-            action: #selector(Self.didTapButton)
-        )
-        logoutButton.tintColor = .red
-        logoutButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logoutButton)
-        logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16).isActive = true
-        logoutButton.centerYAnchor.constraint(equalTo: avatarImageView!.centerYAnchor).isActive = true
-    }
-    
-    private func setupLoginNameLabel() {
-        let loginNameLabel = UILabel()
-        loginNameLabel.text = "@ekaterina_nov"
-        loginNameLabel.textColor = .gray
-        loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(loginNameLabel)
-        loginNameLabel.leadingAnchor.constraint(equalTo: nameLabel!.leadingAnchor).isActive = true
-        loginNameLabel.topAnchor.constraint(equalTo: nameLabel!.bottomAnchor, constant: 8).isActive = true
-        self.loginNameLabel = loginNameLabel
-    }
-    
-    private func setupDescriptionLabel() {
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = "Hello, world!"
-        descriptionLabel.textColor = .white
-        descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(descriptionLabel)
-        descriptionLabel.leadingAnchor.constraint(equalTo: loginNameLabel!.leadingAnchor).isActive = true
-        descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel!.bottomAnchor, constant: 8).isActive = true
-        self.descriptionLabel = descriptionLabel
-    }
-    
-    @objc
-    private func didTapButton() {
-        nameLabel?.removeFromSuperview()
-        nameLabel = nil
+    @objc private func didTapButton() {
+        nameLabel.removeFromSuperview()
+        nameLabel.isHidden = true
     }
 }

@@ -1,7 +1,7 @@
 import UIKit
 
 class ImagesListViewController: UIViewController {
-    private let ShowSingleImageSegueIdentifier = "ShowSingleImage"
+    private let showSingleImageSegueIdentifier = "ShowSingleImage"
     
     @IBOutlet private var tableView: UITableView!
     
@@ -21,9 +21,12 @@ class ImagesListViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowSingleImageSegueIdentifier {
-            let viewController = segue.destination as! SingleImageViewController
-            let indexPath = sender as! IndexPath
+        if segue.identifier == showSingleImageSegueIdentifier {
+            guard let viewController = segue.destination as? SingleImageViewController,
+                  let indexPath = sender as? IndexPath else {
+                return
+            }
+            
             let image = UIImage(named: photosName[indexPath.row])
             viewController.image = image
         } else {
@@ -57,27 +60,18 @@ extension ImagesListViewController {
             return
         }
         
-        cell.cellImage.image = image
-        cell.dateLabel.text = dateFormatter.string(from: Date())
+        cell.setImage(image)
+        cell.setDate(dateFormatter.string(from: Date()))
         
         let isLiked = indexPath.row % 2 == 0
         
         if isLiked {
             let likeImage = UIImage(named: "like_button_on")
-            cell.likeButton.setImage(likeImage, for: .normal)
+            cell.setLikeButtonImage(likeImage, for: .normal)
         } else {
             let likeImage = UIImage(named: "like_button_off")
-            cell.likeButton.setImage(likeImage, for: .normal)
+            cell.setLikeButtonImage(likeImage, for: .normal)
         }
-        
-        
-        // Добавление градиентного размытия
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 0).cgColor,
-                                UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 0.2).cgColor]
-        gradientLayer.locations = [0, 1]
-        gradientLayer.frame = cell.dateLabel.bounds
-        cell.dateLabel.layer.insertSublayer(gradientLayer, at: 0)
     }
 }
 
@@ -85,7 +79,7 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: ShowSingleImageSegueIdentifier, sender: indexPath)
+        performSegue(withIdentifier: showSingleImageSegueIdentifier, sender: indexPath)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
