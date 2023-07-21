@@ -78,9 +78,9 @@ final class OAuth2Service {
     
     private func authTokenRequest(code: String) -> URLRequest {
         let parameters: [String: Any] = [
-            "client_id": "YOUR_CLIENT_ID",
-            "client_secret": "YOUR_CLIENT_SECRET",
-            "redirect_uri": "YOUR_REDIRECT_URI",
+            "client_id": "CrGnzEgtPBgkxTHXzgkRmFYVbe4e7pOKsxyfiUAzMHM",
+            "client_secret": "JjbQCZd3J1MarTVosM_kTtKph3jJAdAZ5RCol8l4e0k",
+            "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
             "code": code,
             "grant_type": "authorization_code"
         ]
