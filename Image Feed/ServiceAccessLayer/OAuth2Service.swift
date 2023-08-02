@@ -19,56 +19,37 @@ final class OAuth2Service {
     static let shared = OAuth2Service()
     
     private let urlSession = URLSession.shared
+    private var task: URLSessionTask?
+    private var lastCode: String?
     
-    func fetchOAuthToken(
-        _ code: String,
-        completion: @escaping (Swift.Result<String, Error>) -> Void
-    ) {
+    func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        
+        // Если уже выполняется запрос на получение токена с другим кодом, отменяем его
+        if let lastCode = lastCode, lastCode != code {
+            task?.cancel()
+        }
+        
+        // Если уже выполняется запрос на получение токена с тем же кодом, ничего не делаем
+        if task != nil {
+            return
+        }
+        
+        // Новый запрос на получение токена
+        lastCode = code
         let request = authTokenRequest(code: code)
-        let task = urlSession.dataTask(with: request) { [weak self] (data, response, error) in
-            guard let self = self else { return }
-            
-            if let error = error {
+        let task = urlSession.objectTask(for: request) { (result: Result<OAuthTokenResponseBody, Error>) in
+            switch result {
+            case .success(let responseBody):
+                let authToken = responseBody.accessToken
+                // Сохраняем Bearer Token в User Defaults
+                UserDefaults.standard.set(authToken, forKey: "BearerToken")
+                DispatchQueue.main.async {
+                    completion(.success(authToken))
+                }
+            case .failure(let error):
                 DispatchQueue.main.async {
                     completion(.failure(error))
-                }
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.urlSessionError))
-                }
-                return
-            }
-            
-            let statusCode = httpResponse.statusCode
-            
-            if 200..<300 ~= statusCode {
-                if let data = data {
-                    do {
-                        let responseBody = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                        let authToken = responseBody.accessToken
-                        
-                        // Сохраняем Bearer Token в User Defaults
-                        UserDefaults.standard.set(authToken, forKey: "BearerToken")
-                        
-                        DispatchQueue.main.async {
-                            completion(.success(authToken))
-                        }
-                    } catch {
-                        DispatchQueue.main.async {
-                            completion(.failure(error))
-                        }
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        completion(.failure(NetworkError.urlSessionError))
-                    }
-                }
-            } else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.httpStatusCode(statusCode)))
                 }
             }
         }
@@ -95,6 +76,11 @@ final class OAuth2Service {
     }
 }
 
+func makeGenericError() -> Error {
+    return NSError(domain: "com.unsplash.error", code: 0, userInfo: [NSLocalizedDescriptionKey: "An unknown error occurred."])
+}
+
+
 // MARK: - HTTP Request
 
 extension OAuth2Service {
@@ -103,12 +89,22 @@ extension OAuth2Service {
         completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
     ) -> URLSessionTask {
         let decoder = JSONDecoder()
-        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            let response = result.flatMap { data -> Result<OAuthTokenResponseBody, Error> in
-                Result { try decoder.decode(OAuthTokenResponseBody.self, from: data) }
+        let task = urlSession.dataTask(with: request) { data, response, error in
+            if let data = data, let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) {
+                do {
+                    let result = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                    completion(.success(result))
+                } catch {
+                    completion(.failure(error))
+                }
+            } else if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.failure(NetworkError.urlSessionError))
             }
-            completion(response)
         }
+        task.resume()
+        return task
     }
 }
 
@@ -130,35 +126,39 @@ enum NetworkError: Error {
     case httpStatusCode(Int)
     case urlRequestError(Error)
     case urlSessionError
+    case unauthorized
+    case invalidURL
+    case missingData
 }
 
 extension URLSession {
-    func data(
+    func objectTask<T: Decodable>(
         for request: URLRequest,
-        completion: @escaping (Result<Data, Error>) -> Void
+        completion: @escaping (Result<T, Error>) -> Void
     ) -> URLSessionTask {
-        let fulfillCompletion: (Result<Data, Error>) -> Void = { result in
+        let fulfillCompletionOnMainThread: (Result<T, Error>) -> Void = { result in
             DispatchQueue.main.async {
                 completion(result)
             }
         }
-        let task = dataTask(with: request, completionHandler: { data, response, error in
-            if let data = data,
-               let httpResponse = response as? HTTPURLResponse {
-                let statusCode = httpResponse.statusCode
-                
-                if 200 ..< 300 ~= statusCode {
-                    fulfillCompletion(.success(data))
-                } else {
-                    fulfillCompletion(.failure(NetworkError.httpStatusCode(statusCode)))
+        
+        let task = dataTask(with: request) { data, response, error in
+            if let data = data, let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) {
+                do {
+                    let decoder = JSONDecoder()
+                    let result = try decoder.decode(T.self, from: data)
+                    fulfillCompletionOnMainThread(.success(result))
+                } catch {
+                    fulfillCompletionOnMainThread(.failure(error))
                 }
             } else if let error = error {
-                fulfillCompletion(.failure(NetworkError.urlRequestError(error)))
+                fulfillCompletionOnMainThread(.failure(error))
             } else {
-                fulfillCompletion(.failure(NetworkError.urlSessionError))
+                fulfillCompletionOnMainThread(.failure(makeGenericError()))
             }
-        })
-        task.resume()
+        }
         return task
     }
 }
+
+

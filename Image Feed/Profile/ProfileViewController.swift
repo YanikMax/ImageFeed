@@ -1,6 +1,9 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     private let avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar")
@@ -51,6 +54,76 @@ final class ProfileViewController: UIViewController {
         
         addSubViews()
         applyConstraints()
+        fetchProfileAndUpdateUI()
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.DidChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        
+        let processor = RoundCornerImageProcessor(cornerRadius: avatarImageView.frame.width / 2)
+        avatarImageView.kf.indicatorType = .activity
+        
+        // Загрузка аватарки с помощью Kingfisher
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "avatar"),
+            options: [
+                .processor(processor),
+                .cacheOriginalImage
+            ],
+            completionHandler: { result in
+                switch result {
+                case .success(let value):
+                    print("Аватарка успешно загружена")
+                    // Можно получить доступ к загруженному изображению через `value.image`.
+                case .failure(let error):
+                    print("Ошибка загрузки аватарки: \(error.localizedDescription)")
+                }
+            }
+        )
+    }
+    
+    private func fetchProfileAndUpdateUI() {
+        guard let token = OAuth2TokenStorage().token else {
+            return
+        }
+        
+        let profileService = ProfileService()
+        profileService.fetchProfile(token) { [weak self] result in
+            switch result {
+            case .success(let profile):
+                // обновление деталей профиля с помощью нового метода
+                self?.updateProfileDetails(profile: profile)
+            case .failure(let error):
+                print("Ошибка получения профиля: \(error)")
+            }
+        }
+    }
+    
+    private func updateProfileDetails(profile: Profile) {
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    private func updateUI(with profile: Profile) {
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
     }
     
     private func addSubViews() {
