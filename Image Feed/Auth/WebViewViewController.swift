@@ -22,10 +22,10 @@ final class WebViewViewController: UIViewController {
         
         guard var urlComponents = URLComponents(string: unsplashAuthorizeURLString) else { return }
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: AccessKey),
-            URLQueryItem(name: "redirect_uri", value: RedirectURI),
+            URLQueryItem(name: "client_id", value: accessKey),
+            URLQueryItem(name: "redirect_uri", value: redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: AccessScope)
+            URLQueryItem(name: "scope", value: accessScope)
         ]
         guard let url = urlComponents.url else { return }
         let request = URLRequest(url: url)
@@ -69,11 +69,12 @@ final class WebViewViewController: UIViewController {
     }
     
     private func updateProgress() {
-        progressView.progress = Float(webView.estimatedProgress)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+        let newProgress = Float(webView.estimatedProgress)
+        progressView.setProgress(newProgress, animated: true)
+        progressView.isHidden = abs(newProgress - 1.0) <= 0.0001
     }
     
-    @IBAction func didRapBackButton(_ sender: Any?) {
+    @IBAction func didTapBackButton(_ sender: Any?) {
         delegate?.webViewViewControllerDidCancel(self)
     }
 }

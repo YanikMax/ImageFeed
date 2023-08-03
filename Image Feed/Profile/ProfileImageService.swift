@@ -1,7 +1,7 @@
 import Foundation
 
 struct UserResult: Codable {
-    let profile_image: ProfileImage
+    let profileImage: ProfileImage
 }
 
 struct ProfileImage: Codable {
@@ -48,11 +48,11 @@ final class ProfileImageService {
         task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             switch result {
             case .success(let userResult):
-                if let avatarURL = userResult.profile_image.small {
+                if let avatarURL = userResult.profileImage.small {
                     self?.avatarURL = avatarURL
                     DispatchQueue.main.async {
                         completion(.success(avatarURL))
-                        NotificationCenter.default.post(name: ProfileImageService.DidChangeNotification, object: nil)
+                        NotificationCenter.default.post(name: ProfileImageService.didChangeNotification, object: nil)
                     }
                 } else {
                     DispatchQueue.main.async {
@@ -70,6 +70,6 @@ final class ProfileImageService {
 }
 
 extension ProfileImageService {
-    static let DidChangeNotification = Notification.Name("ProfileImageServiceDidChangeNotification")
+    static let didChangeNotification = Notification.Name("ProfileImageServiceDidChangeNotification")
 }
 

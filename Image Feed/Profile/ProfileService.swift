@@ -3,8 +3,8 @@ import Foundation
 struct ProfileResult: Codable {
     let username: String
     let firstName: String
-    let lastName: String
-    let bio: String
+    let lastName: String?
+    let bio: String?
     
     enum CodingKeys: String, CodingKey {
         case username
@@ -34,7 +34,13 @@ final class ProfileService {
         }
         
         // создание GET запроса с заголовком Authorization
-        let url = URL(string: "https://unsplash.com/users")!
+        guard let url = URL(string: "https://unsplash.com/me") else {
+            DispatchQueue.main.sync {
+                completion(.failure(NetworkError.invalidURL))
+            }
+            return
+        }
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -61,12 +67,14 @@ final class ProfileService {
     }
     
     private func mapProfileResultToProfile(_ profileResult: ProfileResult) -> Profile {
-        let name = "\(profileResult.firstName) \(profileResult.lastName)"
+        let name = "\(profileResult.firstName) \(profileResult.lastName ?? "")"
         let loginName = "@\(profileResult.username)"
+        let bio = profileResult.bio ?? ""
+        
         return Profile(username: profileResult.username,
                        name: name,
                        loginName: loginName,
-                       bio: profileResult.bio)
+                       bio: bio)
     }
 }
 

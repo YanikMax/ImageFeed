@@ -59,9 +59,9 @@ final class OAuth2Service {
     
     private func authTokenRequest(code: String) -> URLRequest {
         let parameters: [String: Any] = [
-            "client_id": "CrGnzEgtPBgkxTHXzgkRmFYVbe4e7pOKsxyfiUAzMHM",
-            "client_secret": "JjbQCZd3J1MarTVosM_kTtKph3jJAdAZ5RCol8l4e0k",
-            "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+            "client_id": accessKey,
+            "client_secret": secretKey,
+            "redirect_uri": redirectURI,
             "code": code,
             "grant_type": "authorization_code"
         ]
@@ -112,7 +112,7 @@ extension URLRequest {
     static func makeHTTPRequest(
         path: String,
         httpMethod: String,
-        baseURL: URL = DefaultBaseURL
+        baseURL: URL = defaultBaseURL
     ) -> URLRequest {
         var request = URLRequest(url: URL(string: path, relativeTo: baseURL)!)
         request.httpMethod = httpMethod

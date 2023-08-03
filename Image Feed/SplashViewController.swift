@@ -24,20 +24,43 @@ final class SplashViewController: UIViewController {
         applyConstraints()
     }
     
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//        if let token = OAuth2TokenStorage().token {
+//            switchToTabBarController()
+//        } else {
+//            // Показать экран авторизации
+//            let storyboard = UIStoryboard(name: "Main", bundle: .main)
+//
+//            guard let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
+//                print("Failed to instantiate AuthViewController")
+//                return
+//            }
+//            authViewController.delegate = self
+//            authViewController.modalPresentationStyle = .fullScreen
+//            present(authViewController, animated: true, completion: nil)
+//        }
+//    }
+    
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        if let token = OAuth2TokenStorage().token {
-            switchToTabBarController()
-        } else {
-            // Показать экран авторизации
-            let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as! AuthViewController
-            authViewController.delegate = self
-            authViewController.modalPresentationStyle = .fullScreen
-            present(authViewController, animated: true, completion: nil)
-        }
-    }
+         super.viewDidAppear(animated)
+
+         guard UIBlockingProgressHUD.isShowing == false else { return }
+         if let token = OAuth2TokenStorage().token {
+             fetchProfile(token: token)
+             switchToTabBarController()
+         } else {
+             guard let authViewController = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
+                 assertionFailure("Failed to show Authentication Screen")
+                 return
+             }
+
+             authViewController.delegate = self
+             authViewController.modalPresentationStyle = .fullScreen
+             present(authViewController, animated: true)
+         }
+     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -118,10 +141,22 @@ extension SplashViewController: AuthViewControllerDelegate {
     
     private func showAlert(title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ок", style: .default) { _ in
-            // Обработка нажатия кнопки "Ок", если требуется
+        let okAction = UIAlertAction(title: "Ок", style: .default) { [weak self] _ in
+            // Показать экран авторизации
+            self?.showAuthenticationScreen()
         }
         alertController.addAction(okAction)
         present(alertController, animated: true, completion: nil)
+    }
+
+    private func showAuthenticationScreen() {
+        guard let authViewController = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else {
+            assertionFailure("Не удалось показать экран авторизации")
+            return
+        }
+        
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        present(authViewController, animated: true)
     }
 }
