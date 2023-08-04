@@ -7,10 +7,10 @@ struct ProfileResult: Codable {
     let bio: String?
     
     enum CodingKeys: String, CodingKey {
-        case username
-        case firstName
-        case lastName
-        case bio
+        case username = "username"
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case bio = "bio"
     }
 }
 
@@ -23,9 +23,15 @@ struct Profile {
 }
 
 final class ProfileService {
+    // Создание общего экземпляра ProfileService как синглтон
+    static let shared = ProfileService()
+    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
+    
+    var profile: Profile?
+    
+    private init() {}
     
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         // происходит проверка, выполняется ли другая задача, если да, то происходит ее отмена
@@ -34,7 +40,7 @@ final class ProfileService {
         }
         
         // создание GET запроса с заголовком Authorization
-        guard let url = URL(string: "https://unsplash.com/me") else {
+        guard let url = URL(string: "https://api.unsplash.com/me") else {
             DispatchQueue.main.sync {
                 completion(.failure(NetworkError.invalidURL))
             }
@@ -62,7 +68,7 @@ final class ProfileService {
                     completion(.failure(error))
                 }
             }
-        }        
+        }
         task?.resume()
     }
     

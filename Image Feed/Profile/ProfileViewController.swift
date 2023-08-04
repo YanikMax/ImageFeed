@@ -105,11 +105,13 @@ final class ProfileViewController: UIViewController {
             return
         }
         
-        let profileService = ProfileService()
-        profileService.fetchProfile(token) { [weak self] result in
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
             switch result {
             case .success(let profile):
-                // обновление деталей профиля с помощью нового метода
+                // Сохранение профиля в общем экземпляре
+                ProfileService.shared.profile = profile
+                
+                // Обновление пользовательскего интерфейса с использованием сохраненного профиля
                 self?.updateProfileDetails(profile: profile)
             case .failure(let error):
                 print("Ошибка получения профиля: \(error)")

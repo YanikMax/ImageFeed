@@ -2,6 +2,10 @@ import Foundation
 
 struct UserResult: Codable {
     let profileImage: ProfileImage
+    
+    enum CodingKeys: String, CodingKey {
+        case profileImage = "profile_image"
+    }
 }
 
 struct ProfileImage: Codable {
@@ -33,7 +37,7 @@ final class ProfileImageService {
         }
         
         // Создаем GET запрос с заголовком Authorization
-        let urlString = "https://unsplash.com/users/\(username)"
+        let urlString = "https://api.unsplash.com/users/\(username)"
         guard let url = URL(string: urlString) else {
             DispatchQueue.main.async {
                 completion(.failure(NetworkError.invalidURL))

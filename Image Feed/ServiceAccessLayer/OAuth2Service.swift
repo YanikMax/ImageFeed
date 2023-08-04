@@ -42,8 +42,6 @@ final class OAuth2Service {
             switch result {
             case .success(let responseBody):
                 let authToken = responseBody.accessToken
-                // Сохраняем Bearer Token в User Defaults
-                UserDefaults.standard.set(authToken, forKey: "BearerToken")
                 DispatchQueue.main.async {
                     completion(.success(authToken))
                 }
