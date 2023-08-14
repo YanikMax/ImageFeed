@@ -86,7 +86,7 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case .success(let authToken):
                 self.oauth2TokenStorage.token = authToken
-                self.switchToTabBarController()
+                self.fetchProfile(token: authToken)
             case .failure:
                 self.showAlert(title: "Что-то пошло не так(", message: "Не удалось войти в систему")
             }

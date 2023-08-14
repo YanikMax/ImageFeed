@@ -23,7 +23,7 @@ final class ProfileViewController: UIViewController {
     private let logoutButton: UIButton = {
         let button = UIButton.systemButton(
             with: UIImage(systemName: "ipad.and.arrow.forward")!,
-            target: ProfileViewController.self,
+            target: self,
             action: #selector(didTapButton)
         )
         button.tintColor = .red
@@ -100,6 +100,16 @@ final class ProfileViewController: UIViewController {
         )
     }
     
+    private func checkAndFetchProfile() {
+        if let profile = ProfileService.shared.profile {
+            // Профиль уже загружен, отображаем его
+            updateProfileDetails(profile: profile)
+        } else {
+            // Профиль не загружен, выполняем загрузку
+            fetchProfileAndUpdateUI()
+        }
+    }
+    
     private func fetchProfileAndUpdateUI() {
         guard let token = OAuth2TokenStorage().token else {
             return
@@ -164,7 +174,26 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func didTapButton() {
-        nameLabel.removeFromSuperview()
-        nameLabel.isHidden = true
+        let alert = UIAlertController(title: "Пока, пока!", message: "Уверены что хотите выйти?", preferredStyle: .alert)
+        
+        let yesAction = UIAlertAction(title: "Да", style: .default) { _ in
+            OAuth2TokenStorage.shared.clean()
+            WebViewViewController.clean()
+            CacheManager.clean()
+            
+            guard let window = UIApplication.shared.windows.first else {
+                assertionFailure("invalid configuration")
+                return
+            }
+            window.rootViewController = SplashViewController()
+            window.makeKeyAndVisible()
+        }
+        
+        let noAction = UIAlertAction(title: "Нет", style: .default) { _ in
+            alert.dismiss(animated: true)
+        }
+        alert.addAction(yesAction)
+        alert.addAction(noAction)
+        present(alert, animated: true)
     }
 }

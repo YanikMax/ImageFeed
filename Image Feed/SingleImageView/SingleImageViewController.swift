@@ -1,24 +1,76 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
-    var image: UIImage! {
-        didSet {
-            guard isViewLoaded else { return }
-            imageView.image = image
-            rescaleAndCenterImageInScrollView(image: image)
-        }
-    }
+    var image: URL?
+    private var imageDownload: UIImage?
     
     @IBOutlet weak var scrollView: UIScrollView!
-    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet internal var imageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        imageView.image = image
         
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-        rescaleAndCenterImageInScrollView(image: image)
+        loadAndShowImage(url: image)
+    }
+    
+    func loadAndShowImage(url: URL?) {
+        guard let url = url else { return }
+        UIBlockingProgressHUD.show()
+        
+        imageView.kf.setImage(with: url) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            guard let self else { return }
+            
+            switch result {
+            case .success(let imageResult):
+                self.rescaleAndCenterImageInScrollView(image: imageResult.image)
+                self.imageDownload = imageResult.image
+                
+            case .failure(let error):
+                print(error.localizedDescription)
+                self.showError(url: url)
+            }
+        }
+    }
+    
+    func compressImage(_ image: UIImage) -> UIImage {
+        let targetSizeInMB: Double = 10.0
+        let maxCompressionIterations = 5
+        
+        var compressedImage = image
+        var currentSizeInMB = Double(compressedImage.pngData()?.count ?? 0) / (1024.0 * 1024.0)
+        var iteration = 0
+        
+        while currentSizeInMB > targetSizeInMB && iteration < maxCompressionIterations {
+            let compressionRatio: CGFloat = CGFloat(targetSizeInMB / currentSizeInMB)
+            let newWidth = Int(compressedImage.size.width * sqrt(compressionRatio))
+            let newHeight = Int(compressedImage.size.height * sqrt(compressionRatio))
+            let newImageSize = CGSize(width: newWidth, height: newHeight)
+            
+            UIGraphicsBeginImageContext(newImageSize)
+            compressedImage.draw(in: CGRect(origin: .zero, size: newImageSize))
+            if let resizedImage = UIGraphicsGetImageFromCurrentImageContext() {
+                compressedImage = resizedImage
+                currentSizeInMB = Double(compressedImage.pngData()?.count ?? 0) / (1024.0 * 1024.0)
+            }
+            UIGraphicsEndImageContext()
+            iteration += 1
+        }
+        self.imageDownload = compressedImage
+        return compressedImage
+    }
+    
+    func showShareActivityController() {
+        guard let imageDownload = imageDownload else { return }
+        
+        let share = UIActivityViewController(
+            activityItems: [compressImage(imageDownload)],
+            applicationActivities: nil
+        )
+        share.overrideUserInterfaceStyle = .dark
+        present(share, animated: true, completion: nil)
     }
     
     @IBAction private func didTapBackButton() {
@@ -26,17 +78,22 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction func didTapShareButton(_ sender: UIButton) {
-        if let image = image {
-            let share = UIActivityViewController(
-                activityItems: [image],
-                applicationActivities: nil
-            )
-            present(share, animated: true, completion: nil)
-        } else {
-            let alert = UIAlertController(title: "Ошибка", message: "Изображение не доступно.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            present(alert, animated: true, completion: nil)
-        }
+        showShareActivityController()
+    }
+}
+
+extension SingleImageViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        imageView
+    }
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        let imageViewSize = imageView.frame.size
+        let scrollViewSize = scrollView.bounds.size
+        let verticalPadding = imageViewSize.height < scrollViewSize.height ? (scrollViewSize.height - imageViewSize.height) / 2 : 0
+        let horizontalPadding = imageViewSize.width < scrollViewSize.width ? (scrollViewSize.width - imageViewSize.width) / 2 : 0
+        
+        scrollView.contentInset = UIEdgeInsets(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
     }
     
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
@@ -57,8 +114,20 @@ final class SingleImageViewController: UIViewController {
     }
 }
 
-extension SingleImageViewController: UIScrollViewDelegate {
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        imageView
+extension SingleImageViewController {
+    private func showError(url: URL) {
+        let alert = UIAlertController(title: "Ошибка", message: "Изображение не доступно", preferredStyle: .alert)
+        let repeats = UIAlertAction(title: "ОК", style: .default) { [weak self] _ in
+            guard let self else { return }
+            self.loadAndShowImage(url: url)
+        }
+        let cancel = UIAlertAction(title: "ОК", style: .cancel) { _ in
+            alert.dismiss(animated: true)
+        }
+        
+        alert.addAction(cancel)
+        alert.addAction(repeats)
+        
+        present(alert, animated: true)
     }
 }
