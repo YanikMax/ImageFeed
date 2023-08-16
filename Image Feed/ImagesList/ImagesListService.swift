@@ -88,18 +88,21 @@ final class ImagesListService {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let photoResults):
-                    if self.lastLoadedPage == nil {
-                        self.lastLoadedPage = 1
-                    } else {
-                        self.lastLoadedPage! += 1
-                    }
+                    self.lastLoadedPage = (self.lastLoadedPage == nil) ? 1 : self.lastLoadedPage! + 1
                     let newPhotos = photoResults.map { Photo($0, date: self.dateFormatter) }
                     self.photos.append(contentsOf: newPhotos)
                     
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
                     
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    let errorMessage = error.localizedDescription
+                    let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    alert.addAction(okAction)
+                    
+                    if let topViewController = UIApplication.shared.windows.first?.rootViewController {
+                        topViewController.present(alert, animated: true, completion: nil)
+                    }
                 }
             }
             self.currentTask = nil
@@ -139,7 +142,16 @@ final class ImagesListService {
                         completion(.success(()))
                     }
                 case .failure(let error):
-                    assertionFailure("like error: \(error)")
+                    let errorMessage = "Error occurred while changing like: \(error.localizedDescription)"
+                    completion(.failure(NSError(domain: "ChangeLikeErrorDomain", code: 2, userInfo: [NSLocalizedDescriptionKey: errorMessage])))
+                    
+                    let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    alert.addAction(okAction)
+                    
+                    if let topViewController = UIApplication.shared.windows.first?.rootViewController {
+                        topViewController.present(alert, animated: true, completion: nil)
+                    }
                 }
             }
         }
@@ -148,7 +160,7 @@ final class ImagesListService {
     }
     
     private func makeRequest(authToken: String, page: Int) -> URLRequest? {
-        guard var urlComponents = URLComponents(string: "https://api.unsplash.com/photos") else {
+        guard var urlComponents = URLComponents(string: photosBaseURL) else {
             assertionFailure("Error with URL")
             return nil
         }
@@ -168,7 +180,6 @@ final class ImagesListService {
     }
     
     private func likeRequest(photoId: String, isLike: Bool) -> URLRequest? {
-        let baseURL = "https://api.unsplash.com"
         let likeURL = "\(baseURL)/photos/\(photoId)/like"
         
         guard let url = URL(string: likeURL) else {

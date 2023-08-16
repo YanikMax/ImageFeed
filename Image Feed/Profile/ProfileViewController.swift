@@ -196,4 +196,10 @@ final class ProfileViewController: UIViewController {
         alert.addAction(noAction)
         present(alert, animated: true)
     }
+    
+    deinit {
+        if let observer = profileImageServiceObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
 }

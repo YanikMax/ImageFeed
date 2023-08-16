@@ -107,9 +107,9 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
     
     private func fetchProfileImage(username: String) {
-        ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in
+        ProfileImageService.shared.fetchProfileImageURL(username: username) { [weak self] _ in
             DispatchQueue.main.async {
-                self.switchToTabBarController()
+                self?.switchToTabBarController()
             }
         }
     }

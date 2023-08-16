@@ -8,20 +8,17 @@ final class ImagesListViewController: UIViewController {
     
     @IBOutlet private var tableView: UITableView!
     
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMMM yyyy"
-        formatter.locale = Locale(identifier: "ru_RU")
-        return formatter
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         setupTableView()
-        notifications()
+        addNotifications()
         imagesListService.fetchPhotosNextPage()
+    }
+    
+    deinit {
+        removeNotifications()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -63,20 +60,25 @@ extension ImagesListViewController: UITableViewDataSource {
     }
 }
 
-
 // MARK: Notification
 
 extension ImagesListViewController{
-    private func notifications() {
+    private func addNotifications() {
         imagesListServiceObserver = NotificationCenter.default
             .addObserver(
                 forName: ImagesListService.didChangeNotification,
                 object: nil,
                 queue: .main
             ) { [ weak self ] _ in
-                guard let self = self else { return }
-                self.updateTableViewAnimated()
+                self?.updateTableViewAnimated()
             }
+    }
+    
+    private func removeNotifications() {
+        if let observer = imagesListServiceObserver {
+            NotificationCenter.default.removeObserver(observer)
+            imagesListServiceObserver = nil
+        }
     }
 }
 
@@ -139,17 +141,31 @@ extension ImagesListViewController: ImagesListCellDelegate {
             case .success:
                 self.photos = self.imagesListService.photos
                 cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
-                UIBlockingProgressHUD.dismiss()
                 
             case .failure(let error):
-                UIBlockingProgressHUD.dismiss()
-                let alert = UIAlertController(title: "Ошибка", message: "Что-то пошло не так", preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "Ок", style: .default)
-                
-                alert.addAction(okAction)
-                self.present(alert, animated: true)
+                self.showAlert(title: "Ошибка", message: "Что-то пошло не так")
                 print(error.localizedDescription)
             }
+            
+            UIBlockingProgressHUD.dismiss()
         }
     }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ок", style: .default)
+        alert.addAction(okAction)
+        self.present(alert, animated: true)
+    }
+}
+
+// MARK: - DateFormatter
+
+extension DateFormatter {
+    static var customFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMMM yyyy"
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter
+    }()
 }

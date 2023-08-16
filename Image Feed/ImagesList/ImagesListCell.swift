@@ -33,7 +33,8 @@ final class ImagesListCell: UITableViewCell {
         cellImage.kf.indicatorType = .activity
         
         let placeholderImage = UIImage(named: "placeholderImage")
-        cellImage.kf.setImage(with: url, placeholder: placeholderImage) { result in
+        cellImage.kf.setImage(with: url, placeholder: placeholderImage) { [weak self] result in
+            guard let self = self else { return }
             
             switch result {
             case .success(let image):
