@@ -180,7 +180,7 @@ final class ImagesListService {
     }
     
     private func likeRequest(photoId: String, isLike: Bool) -> URLRequest? {
-        let likeURL = "\(baseURL)/photos/\(photoId)/like"
+        let likeURL = "\(DefaultBaseURL)/photos/\(photoId)/like"
         
         guard let url = URL(string: likeURL) else {
             assertionFailure("Error with URL")

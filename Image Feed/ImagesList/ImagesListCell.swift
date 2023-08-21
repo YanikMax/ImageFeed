@@ -17,6 +17,7 @@ final class ImagesListCell: UITableViewCell {
         super.prepareForReuse()
         
         cellImage.kf.cancelDownloadTask()
+        likeButton.accessibilityIdentifier = "like_button_off"
     }
     
     private lazy var dateFormatter: DateFormatter = {
