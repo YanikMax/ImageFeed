@@ -2,61 +2,6 @@ import Foundation
 import UIKit
 import Kingfisher
 
-struct UrlsResult: Decodable {
-    let full: String
-    let regular: String
-    let small: String
-    let thumb: String
-}
-
-struct PhotoResult: Decodable {
-    let id: String
-    let width: Int
-    let height: Int
-    let createdAt: String?
-    let description: String?
-    let urls: UrlsResult
-    let likedByUser: Bool
-    
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case createdAt = "created_at"
-        case width
-        case height
-        case description
-        case urls
-        case likedByUser = "liked_by_user"
-    }
-}
-
-struct Photo {
-    let id: String
-    let size: CGSize
-    let createdAt: Date?
-    let welcomeDescription: String?
-    let thumbImageURL: String
-    let largeImageURL: String
-    let regularImageURL:String
-    let smallImageURL:String
-    let isLiked: Bool
-    
-    init(_ photoResult: PhotoResult, date: ISO8601DateFormatter) {
-        self.id = photoResult.id
-        self.size = CGSize(width: photoResult.width, height: photoResult.height)
-        self.createdAt = date.date(from: photoResult.createdAt ?? "")
-        self.welcomeDescription = photoResult.description
-        self.thumbImageURL = photoResult.urls.thumb
-        self.largeImageURL = photoResult.urls.full
-        self.regularImageURL = photoResult.urls.regular
-        self.smallImageURL = photoResult.urls.small
-        self.isLiked = photoResult.likedByUser
-    }
-}
-
-struct PhotoLiked: Decodable {
-    let photo: PhotoResult
-}
-
 final class ImagesListService {
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     static let shared = ImagesListService()
@@ -119,7 +64,9 @@ final class ImagesListService {
         guard let request = likeRequest(photoId: photoId, isLike: isLike) else {
             return
         }
-        let task = urlSession.objectTask(for: request) { (result: Result<PhotoLiked, Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<PhotoLiked, Error>) in
+            guard let self = self else { return }
+            
             DispatchQueue.main.async {
                 switch result {
                 case .success:
@@ -160,7 +107,7 @@ final class ImagesListService {
     }
     
     private func makeRequest(authToken: String, page: Int) -> URLRequest? {
-        guard var urlComponents = URLComponents(string: photosBaseURL) else {
+        guard var urlComponents = URLComponents(string: UnsplashConfig.photosBaseURL) else {
             assertionFailure("Error with URL")
             return nil
         }
@@ -180,7 +127,7 @@ final class ImagesListService {
     }
     
     private func likeRequest(photoId: String, isLike: Bool) -> URLRequest? {
-        let likeURL = "\(DefaultBaseURL)/photos/\(photoId)/like"
+        let likeURL = "\(UnsplashConfig.defaultBaseURL)/photos/\(photoId)/like"
         
         guard let url = URL(string: likeURL) else {
             assertionFailure("Error with URL")

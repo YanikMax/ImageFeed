@@ -1,17 +1,5 @@
 import Foundation
 
-struct UserResult: Codable {
-    let profileImage: ProfileImage
-    
-    enum CodingKeys: String, CodingKey {
-        case profileImage = "profile_image"
-    }
-}
-
-struct ProfileImage: Codable {
-    let small: String?
-}
-
 final class ProfileImageService {
     static let shared = ProfileImageService()
     private let urlSession = URLSession.shared

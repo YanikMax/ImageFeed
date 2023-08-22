@@ -1,7 +1,5 @@
 import Foundation
 
-//fileprivate let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-
 public protocol WebViewPresenterProtocol {
     var view: WebViewViewControllerProtocol? { get set }
     func viewDidLoad()
@@ -13,26 +11,15 @@ final class WebViewPresenter: WebViewPresenterProtocol {
     weak var view: WebViewViewControllerProtocol?
     
     var authHelper: AuthHelperProtocol
-        
-        init(authHelper: AuthHelperProtocol) {
-            self.authHelper = authHelper
-        }
+    
+    init(authHelper: AuthHelperProtocol) {
+        self.authHelper = authHelper
+    }
     
     func viewDidLoad() {
-//        guard var urlComponents = URLComponents(string: UnsplashAuthorizeURLString) else { return }
-//        urlComponents.queryItems = [
-//            URLQueryItem(name: "client_id", value: AccessKey),
-//            URLQueryItem(name: "redirect_uri", value: RedirectURI),
-//            URLQueryItem(name: "response_type", value: "code"),
-//            URLQueryItem(name: "scope", value: AccessScope)
-//        ]
-//        guard let url = urlComponents.url else { return }
-        //let request = URLRequest(url: url)
         let request = authHelper.authRequest()
         view?.load(request: request)
         didUpdateProgressValue(0)
-        
-        //webView.load(request)
     }
     
     func didUpdateProgressValue(_ newValue: Double) {

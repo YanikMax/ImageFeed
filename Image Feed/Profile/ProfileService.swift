@@ -1,33 +1,5 @@
 import Foundation
 
-struct ProfileResult: Codable {
-    let username: String
-    let firstName: String
-    let lastName: String?
-    let bio: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case username = "username"
-        case firstName = "first_name"
-        case lastName = "last_name"
-        case bio = "bio"
-    }
-}
-
-struct Profile {
-    let username: String
-    let name: String?
-    let loginName: String
-    let bio: String?
-    
-    init(username: String, name: String?, loginName: String, bio: String?) {
-        self.username = username
-        self.name = name ?? ""
-        self.loginName = loginName
-        self.bio = bio ?? ""
-    }
-}
-
 final class ProfileService {
     // Создание общего экземпляра ProfileService как синглтон
     static let shared = ProfileService()

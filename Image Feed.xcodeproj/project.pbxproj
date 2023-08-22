@@ -8,6 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		284C01722A929FF40099F36C /* ImageListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01712A929FF40099F36C /* ImageListPresenter.swift */; };
+		284C01762A9507990099F36C /* UrlsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01752A9507990099F36C /* UrlsResult.swift */; };
+		284C01782A9507C70099F36C /* PhotoResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01772A9507C70099F36C /* PhotoResult.swift */; };
+		284C017A2A9507F20099F36C /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01792A9507F20099F36C /* Photo.swift */; };
+		284C017C2A9508180099F36C /* PhotoLiked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C017B2A9508180099F36C /* PhotoLiked.swift */; };
+		284C017E2A9508650099F36C /* ProfileResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C017D2A9508650099F36C /* ProfileResult.swift */; };
+		284C01802A9508880099F36C /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C017F2A9508880099F36C /* Profile.swift */; };
+		284C01822A95090D0099F36C /* OAuthTokenResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01812A95090D0099F36C /* OAuthTokenResponseBody.swift */; };
+		284C01842A950B4B0099F36C /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01832A950B4B0099F36C /* Extensions.swift */; };
+		284C01872A951CAB0099F36C /* UserResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01862A951CAB0099F36C /* UserResult.swift */; };
+		284C01892A951CCB0099F36C /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284C01882A951CCB0099F36C /* ProfileImage.swift */; };
 		285064A12A4AF3AE00ADF83C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 285064A02A4AF3AE00ADF83C /* Assets.xcassets */; };
 		285064A32A4F5C1C00ADF83C /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285064A22A4F5C1C00ADF83C /* AuthConfiguration.swift */; };
 		285064A52A557E1B00ADF83C /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285064A42A557E1B00ADF83C /* AuthViewController.swift */; };
@@ -80,6 +90,16 @@
 
 /* Begin PBXFileReference section */
 		284C01712A929FF40099F36C /* ImageListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageListPresenter.swift; sourceTree = "<group>"; };
+		284C01752A9507990099F36C /* UrlsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlsResult.swift; sourceTree = "<group>"; };
+		284C01772A9507C70099F36C /* PhotoResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoResult.swift; sourceTree = "<group>"; };
+		284C01792A9507F20099F36C /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		284C017B2A9508180099F36C /* PhotoLiked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLiked.swift; sourceTree = "<group>"; };
+		284C017D2A9508650099F36C /* ProfileResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileResult.swift; sourceTree = "<group>"; };
+		284C017F2A9508880099F36C /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		284C01812A95090D0099F36C /* OAuthTokenResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthTokenResponseBody.swift; sourceTree = "<group>"; };
+		284C01832A950B4B0099F36C /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		284C01862A951CAB0099F36C /* UserResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResult.swift; sourceTree = "<group>"; };
+		284C01882A951CCB0099F36C /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		285064A02A4AF3AE00ADF83C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		285064A22A4F5C1C00ADF83C /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
 		285064A42A557E1B00ADF83C /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
@@ -164,6 +184,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		284C01742A9507730099F36C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				284C01752A9507990099F36C /* UrlsResult.swift */,
+				284C01772A9507C70099F36C /* PhotoResult.swift */,
+				284C01792A9507F20099F36C /* Photo.swift */,
+				284C017B2A9508180099F36C /* PhotoLiked.swift */,
+				284C017D2A9508650099F36C /* ProfileResult.swift */,
+				284C017F2A9508880099F36C /* Profile.swift */,
+				284C01812A95090D0099F36C /* OAuthTokenResponseBody.swift */,
+				284C01862A951CAB0099F36C /* UserResult.swift */,
+				284C01882A951CCB0099F36C /* ProfileImage.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		284C01852A950CE10099F36C /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				284C01832A950B4B0099F36C /* Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		285064A62A557E5400ADF83C /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -287,12 +331,14 @@
 		7D9CFA4128DDEE7F00D971A7 /* Image Feed */ = {
 			isa = PBXGroup;
 			children = (
+				284C01742A9507730099F36C /* Models */,
 				285064AD2A63DF2600ADF83C /* ServiceAccessLayer */,
 				285064A62A557E5400ADF83C /* Auth */,
 				28B71BD22A439DDC009147DC /* Profile */,
 				28E470842A2CE58100A855C0 /* ImagesList */,
 				28B71BD52A439EC6009147DC /* SingleImageView */,
 				28D991E02A89A5A400EA7561 /* Cache */,
+				284C01852A950CE10099F36C /* Extensions */,
 				285064AB2A61F34400ADF83C /* SplashViewController.swift */,
 				2893EA3F2A6F5B37002251AB /* UIBlockingProgressHUD.swift */,
 				2893EA4B2A7858E5002251AB /* TabBarController.swift */,
@@ -545,18 +591,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				284C01762A9507990099F36C /* UrlsResult.swift in Sources */,
 				7D9CFA4328DDEE7F00D971A7 /* AppDelegate.swift in Sources */,
+				284C01802A9508880099F36C /* Profile.swift in Sources */,
 				28CBF0E62A918B02007193E2 /* ProfileViewControllerSpy.swift in Sources */,
 				2893EA4C2A7858E5002251AB /* TabBarController.swift in Sources */,
 				28E470832A2CE54D00A855C0 /* ImagesListCell.swift in Sources */,
 				28D991DF2A7FED6E00EA7561 /* ImagesListService.swift in Sources */,
+				284C017E2A9508650099F36C /* ProfileResult.swift in Sources */,
+				284C017A2A9507F20099F36C /* Photo.swift in Sources */,
+				284C01872A951CAB0099F36C /* UserResult.swift in Sources */,
+				284C017C2A9508180099F36C /* PhotoLiked.swift in Sources */,
 				285064AF2A63DF4100ADF83C /* OAuth2Service.swift in Sources */,
 				28B71BD42A439DF7009147DC /* ProfileViewController.swift in Sources */,
 				7D9CFA5728DDEF8900D971A7 /* ImagesListViewController.swift in Sources */,
 				285064A52A557E1B00ADF83C /* AuthViewController.swift in Sources */,
+				284C01822A95090D0099F36C /* OAuthTokenResponseBody.swift in Sources */,
 				284C01722A929FF40099F36C /* ImageListPresenter.swift in Sources */,
+				284C01782A9507C70099F36C /* PhotoResult.swift in Sources */,
 				2893EA402A6F5B37002251AB /* UIBlockingProgressHUD.swift in Sources */,
+				284C01892A951CCB0099F36C /* ProfileImage.swift in Sources */,
 				28D639FD2A8E6D7C009E56D3 /* WebViewPresenter.swift in Sources */,
+				284C01842A950B4B0099F36C /* Extensions.swift in Sources */,
 				28CBF0E82A918B2F007193E2 /* ProfileViewPresenterSpy.swift in Sources */,
 				285064A32A4F5C1C00ADF83C /* AuthConfiguration.swift in Sources */,
 				28D991E22A89A5BD00EA7561 /* Cache.swift in Sources */,

@@ -1,20 +1,6 @@
 import Foundation
 import WebKit
 
-struct OAuthTokenResponseBody: Decodable {
-    let accessToken: String
-    let tokenType: String
-    let scope: String
-    let createdAt: Int
-    
-    enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
-        case tokenType = "token_type"
-        case scope
-        case createdAt = "created_at"
-    }
-}
-
 final class OAuth2Service {
     static let shared = OAuth2Service()
     
@@ -57,9 +43,9 @@ final class OAuth2Service {
     
     private func authTokenRequest(code: String) -> URLRequest {
         let parameters: [String: Any] = [
-            "client_id": AccessKey,
-            "client_secret": SecretKey,
-            "redirect_uri": RedirectURI,
+            "client_id": UnsplashConfig.accessKey,
+            "client_secret": UnsplashConfig.secretKey,
+            "redirect_uri": UnsplashConfig.redirectURI,
             "code": code,
             "grant_type": "authorization_code"
         ]
@@ -110,7 +96,7 @@ extension URLRequest {
     static func makeHTTPRequest(
         path: String,
         httpMethod: String,
-        baseURL: URL = DefaultBaseURL
+        baseURL: URL = UnsplashConfig.defaultBaseURL
     ) -> URLRequest {
         var request = URLRequest(url: URL(string: path, relativeTo: baseURL)!)
         request.httpMethod = httpMethod

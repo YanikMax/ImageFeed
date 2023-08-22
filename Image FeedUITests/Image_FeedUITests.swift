@@ -2,11 +2,14 @@ import XCTest
 import Image_Feed
 
 class Image_FeedUITests: XCTestCase {
-    private let app = XCUIApplication() // переменная приложения
+    private let fullName = ""
+    private let userName = ""
+    
+    private let app = XCUIApplication()
     
     override func setUpWithError() throws {
-        continueAfterFailure = false // настройка выполнения тестов, которая прекратит выполнения тестов, если в тесте что-то пошло не так
-        app.launch() // запускаем приложение перед каждым тестом
+        continueAfterFailure = false
+        app.launch()
     }
     
     func testAuth() throws {
@@ -58,13 +61,13 @@ class Image_FeedUITests: XCTestCase {
         let navBackButtonWhiteButton = app.buttons["Backward"]
         navBackButtonWhiteButton.tap()
     }
-
+    
     func testProfile() throws {
         sleep(5)
         app.tabBars.buttons.element(boundBy: 1).tap()
-       
-        XCTAssertTrue(app.staticTexts["Yan Maksimov"].exists)
-        XCTAssertTrue(app.staticTexts["@yanikmax"].exists)
+        
+        XCTAssertTrue(app.staticTexts["\(fullName)"].exists)
+        XCTAssertTrue(app.staticTexts["\(userName)"].exists)
         
         app.buttons["ipad.and.arrow.forward"].tap()
         
