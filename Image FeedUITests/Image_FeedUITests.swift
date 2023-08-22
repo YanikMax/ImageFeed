@@ -2,7 +2,7 @@ import XCTest
 import Image_Feed
 
 class Image_FeedUITests: XCTestCase {
-    private let fullName = "Yandex"
+    private let fullName = "Yandex "
     private let userName = "@ypios"
     
     private let app = XCUIApplication()
